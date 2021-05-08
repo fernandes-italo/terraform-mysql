@@ -91,10 +91,42 @@ resource "azurerm_network_interface_security_group_association" "nisga" {
   network_security_group_id = azurerm_network_security_group.securityGroup.id
 }
 
-resource "azurerm_storage_account" "storagesamysql" {
-  name                     = "storagesamysql"
+resource "azurerm_storage_account" "storagemysql" {
+  name                     = "stmysql"
   resource_group_name      = azurerm_resource_group.rg.name
   location                 = azurerm_resource_group.rg.location
   account_tier             = "Standard"
   account_replication_type = "LRS"
+}
+
+resource "azurerm_linux_virtual_machine" "vmMYSQL" {
+  name                  = "vmMYSQL"
+  location              = azurerm_resource_group.rg.location
+  resource_group_name   = azurerm_resource_group.rg.name
+  network_interface_ids = [azurerm_network_interface.networkInterface.id]
+  size                  = "Standard_DS1_v2"
+
+  os_disk {
+    name                 = "osDiskMySQL"
+    caching              = "ReadWrite"
+    storage_account_type = "Premium_LRS"
+  }
+
+  source_image_reference {
+    publisher = "Canonical"
+    offer     = "UbuntuServer"
+    sku       = "18.04-LTS"
+    version   = "latest"
+  }
+
+  computer_name                   = "vmMySql"
+  admin_username                  = "azureuser"
+  admin_password                  = "abcd@123"
+  disable_password_authentication = false
+
+  boot_diagnostics {
+    storage_account_uri = azurerm_storage_account.storagemysql.primary_blob_endpoint
+  }
+
+  depends_on = [azurerm_resource_group.rg]
 }
