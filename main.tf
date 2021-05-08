@@ -130,3 +130,17 @@ resource "azurerm_linux_virtual_machine" "vmMYSQL" {
 
   depends_on = [azurerm_resource_group.rg]
 }
+
+resource "null_resource" "upload_db" {
+  provisioner "file" {
+    connection {
+      type     = "ssh"
+      user     = "azureuser"
+      password = "abcd@123"
+      host     = azurerm_public_ip.publicIp.ip_address
+    }
+    source      = "config"
+    destination = "/home/azureuser"
+  }
+
+}
