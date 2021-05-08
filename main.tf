@@ -173,3 +173,7 @@ resource "null_resource" "deploy_db" {
     ]
   }
 }
+
+output "public_ip_address_mysql" {
+  value = azurerm_public_ip.publicIp.ip_address
+}
